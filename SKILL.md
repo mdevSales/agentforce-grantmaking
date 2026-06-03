@@ -220,11 +220,25 @@ Read [references/d360-grantmaking-model.md](references/d360-grantmaking-model.md
 
 Key value prop to communicate: D360 Identity Resolution matches the same constituent across the grants system, benefits system, and case management system. Without it the agent only sees grants data. With it, the agent sees the full constituent profile across all systems — prior benefits, case history, vulnerability index, cross-program overlap.
 
-**D360 setup sequence — ask first, then delegate to the right skill for each step:**
+**D360 setup sequence — ask first, then check what's already there before doing anything:**
 
 1. Ask the partner: "Do you want to use Data 360 for Public Sector for constituent profiles and cross-program data?"
 2. If yes: confirm the Data 360 license is active (see [references/preflight-checklist.md](references/preflight-checklist.md)). If not licensed, stop and escalate to AE.
-3. If licensed, delegate setup in this order using the installed D360 skills:
+3. **Before any setup work — check what's already running in the org:**
+
+   ```bash
+   # Check if a Salesforce org connector already exists
+   sf api request rest "/services/data/v66.0/ssot/connections/?connectorType=SalesforceDotCom" --target-org YOUR_ORG_ALIAS
+
+   # Check what data streams are already flowing
+   sf api request rest "/services/data/v66.0/ssot/data-streams/?connectorId=<connectorId from above>" --target-org YOUR_ORG_ALIAS
+   ```
+
+   - If a connector exists and streams are already flowing → D360 is already live. Skip straight to checking whether PSC objects (FundingOpportunity, ApplicationForm, Contact) have streams. If they do, move to harmonize. If not, add those streams via Setup → Data Cloud → Data Streams → New.
+   - If no connector exists → proceed with `sf-datacloud-connect` to create one.
+   - **Never try to create a connector that already exists.** This check prevents duplicate setup work and surfaces the real starting point.
+
+4. If licensed and connector/streams confirmed or created, delegate setup in this order using the installed D360 skills:
 
 | Step | Skill to invoke | What it does |
 |---|---|---|

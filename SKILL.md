@@ -218,15 +218,14 @@ Read [references/knowledge-base-setup.md](references/knowledge-base-setup.md).
 #### K. Data 360 Branch
 Read [references/d360-grantmaking-model.md](references/d360-grantmaking-model.md), [references/d360-identity-resolution.md](references/d360-identity-resolution.md), [references/d360-calculated-insights.md](references/d360-calculated-insights.md).
 
-Key value prop to communicate: D360 Identity Resolution matches the same constituent across the grants system, benefits system, and case management system. Without IR the agent only sees grants data. With IR it sees the full constituent profile across all systems.
+Key value prop to communicate: D360 Identity Resolution matches the same constituent across the grants system, benefits system, and case management system. Without it the agent only sees grants data. With it, the agent sees the full constituent profile across all systems — prior benefits, case history, vulnerability index, cross-program overlap.
 
-Activation sequence (delegate in this order):
-1. `sf-datacloud-act` → activation targets + downstream delivery first
-2. `sf-datacloud-connect` → Salesforce org connector
-3. `sf-datacloud-harmonize` → DMO mapping using PSC → D360 table in the reference file
+**D360 setup is simple — ask first:**
+1. Ask the partner: "Do you want to use Data 360 for Public Sector for constituent profiles?"
+2. If yes: confirm D360 is enabled in the org (`sf data query --json -q "SELECT Id FROM DataStream LIMIT 1" --target-org YOUR_ORG` — if it errors, D360 is not enabled). If it's not on, ask the partner to enable it in Setup → Data Cloud.
+3. Once confirmed on, the schema exploration and DMO mapping work follows — use `salesforce-data-360` skill or `sf-pi` `/sf-data360` extension for discovery.
 
-For schema exploration: use `salesforce-data-360` skill (bash scripts via Anonymous Apex) OR the `sf-pi` `/sf-data360` extension (`data360_discover`, `data360_connect`, `data360_query`, `data360_api`). Both use the existing `sf` CLI session — no separate OAuth token needed.
-- sf-pi install: `pi install git:github.com/salesforce/sf-pi`
+D360 does not require a complex deployment pipeline to get started. It is a feature that is either on or off in the org. The deeper harmonization work (DMO mapping, Identity Resolution rulesets, Calculated Insights) only applies after D360 is enabled and the partner wants to use those specific capabilities.
 
 #### L. Gov Cloud Gate
 Read [references/nga-vs-legacy-guide.md](references/nga-vs-legacy-guide.md).
@@ -326,8 +325,7 @@ sf data query --json -q "SELECT Id, Name, Status, MinimumFundingAmount, MaximumF
 |---|---|---|
 | NGA build + ADL | Produces Agent Spec, hands off with context | `developing-agentforce` |
 | Prompt Template actions | Explains when/why, provides context + XML patterns | `salesforce-prompt-templates` |
-| D360 activation | Explains semantic model + IR value prop | `sf-datacloud-act` → `sf-datacloud-connect` → `sf-datacloud-harmonize` |
-| D360 schema exploration | Provides object mapping table | `salesforce-data-360` or `sf-pi` `/sf-data360` |
+| D360 | Ask if needed, confirm it's enabled in Setup, then guide DMO mapping + IR | `salesforce-data-360` or `sf-pi` `/sf-data360` for schema exploration |
 | OmniStudio forms | Detects dependency, explains fallback | `sf-industry-commoncore-omniscript` |
 | Permission assignment | Provides full matrix | `sf-permissions` |
 | Web search | Walks through standard asset setup directly | (inline) |

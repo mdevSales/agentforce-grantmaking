@@ -1,6 +1,6 @@
 # agentforce-grantmaking
 
-A Claude skill that guides Salesforce partners through designing, building, and deploying Agentforce agents for Public Sector grantmaking. Covers the full lifecycle: org readiness, PSC data model, action selection, Prompt Template-backed LLM actions, multi-turn state, human handoff, authentication gates, Data 360 integration, and agent deployment.
+A Claude skill that guides end users through designing, building, and deploying Agentforce agents for Public Sector grantmaking. Covers the full lifecycle: org readiness, PSC data model, action selection, Prompt Template-backed LLM actions, multi-turn state, human handoff, authentication gates, Data 360 integration, and agent deployment.
 
 ---
 

@@ -220,12 +220,22 @@ Read [references/d360-grantmaking-model.md](references/d360-grantmaking-model.md
 
 Key value prop to communicate: D360 Identity Resolution matches the same constituent across the grants system, benefits system, and case management system. Without it the agent only sees grants data. With it, the agent sees the full constituent profile across all systems — prior benefits, case history, vulnerability index, cross-program overlap.
 
-**D360 setup is simple — ask first:**
-1. Ask the partner: "Do you want to use Data 360 for Public Sector for constituent profiles?"
-2. If yes: confirm D360 is enabled in the org (`sf data query --json -q "SELECT Id FROM DataStream LIMIT 1" --target-org YOUR_ORG` — if it errors, D360 is not enabled). If it's not on, ask the partner to enable it in Setup → Data Cloud.
-3. Once confirmed on, the schema exploration and DMO mapping work follows — use `salesforce-data-360` skill or `sf-pi` `/sf-data360` extension for discovery.
+**D360 setup sequence — ask first, then delegate to the right skill for each step:**
 
-D360 does not require a complex deployment pipeline to get started. It is a feature that is either on or off in the org. The deeper harmonization work (DMO mapping, Identity Resolution rulesets, Calculated Insights) only applies after D360 is enabled and the partner wants to use those specific capabilities.
+1. Ask the partner: "Do you want to use Data 360 for Public Sector for constituent profiles and cross-program data?"
+2. If yes: confirm the Data 360 license is active (see [references/preflight-checklist.md](references/preflight-checklist.md)). If not licensed, stop and escalate to AE.
+3. If licensed, delegate setup in this order using the installed D360 skills:
+
+| Step | Skill to invoke | What it does |
+|---|---|---|
+| Connect source data | `sf-datacloud-connect` | Sets up the Salesforce org connector so D360 ingests PSC data |
+| Prepare data streams | `sf-datacloud-prepare` | Creates data streams and DLOs from PSC objects |
+| Harmonize to DMOs | `sf-datacloud-harmonize` | Maps FundingRequest → Case DMO, FundingAward → Benefit DMO, Contact → Individual DMO (see PSC → D360 table in [references/d360-grantmaking-model.md](references/d360-grantmaking-model.md)) |
+| Explore schema | `salesforce-data-360` | Query DMOs/DLOs/CIOs via Anonymous Apex once data is flowing |
+| Activations | `sf-datacloud-act` | Push D360 outputs back into Salesforce for agent consumption |
+| Segments | `sf-datacloud-segment` | Build constituent segments if targeted outreach is in scope |
+
+For live schema exploration after setup: also available via `sf-pi` `/sf-data360` extension (`data360_discover`, `data360_query`, `data360_api`) if the partner has sf-pi installed.
 
 #### L. Gov Cloud Gate
 Read [references/nga-vs-legacy-guide.md](references/nga-vs-legacy-guide.md).
@@ -325,7 +335,12 @@ sf data query --json -q "SELECT Id, Name, Status, MinimumFundingAmount, MaximumF
 |---|---|---|
 | NGA build + ADL | Produces Agent Spec, hands off with context | `developing-agentforce` |
 | Prompt Template actions | Explains when/why, provides context + XML patterns | `salesforce-prompt-templates` |
-| D360 | Ask if needed, confirm it's enabled in Setup, then guide DMO mapping + IR | `salesforce-data-360` or `sf-pi` `/sf-data360` for schema exploration |
+| D360 connect | Source connection setup | `sf-datacloud-connect` |
+| D360 prepare | Data streams + DLOs | `sf-datacloud-prepare` |
+| D360 harmonize | DMO mapping (PSC → D360 semantic model) | `sf-datacloud-harmonize` |
+| D360 explore | Query DMOs/DLOs/CIOs | `salesforce-data-360` or `sf-pi` `/sf-data360` |
+| D360 activate | Push outputs back to Salesforce | `sf-datacloud-act` |
+| D360 segment | Constituent segmentation | `sf-datacloud-segment` |
 | OmniStudio forms | Detects dependency, explains fallback | `sf-industry-commoncore-omniscript` |
 | Permission assignment | Provides full matrix | `sf-permissions` |
 | Web search | Walks through standard asset setup directly | (inline) |

@@ -37,8 +37,9 @@ Help me build an Agentforce agent for our grant management program. We have PSC 
 4. **Recommends an action set** — 11 actions with backing logic tags (STANDARD, FLOW, PROMPT_TEMPLATE) and rationale
 5. **Handles advanced patterns** — multi-turn state management, authentication gates for service agents, human handoff via Case creation Flow
 6. **Produces an Agent Spec** — complete spec requiring explicit approval before any build work starts
-7. **Builds the agent** — NGA Agent Script (via `developing-agentforce` skill) or legacy Agent Builder guidance with step-by-step instructions
-8. **Wires in Data 360** — D360 for Public Sector semantic model mapping, Identity Resolution, Calculated Insights, delegating to `sf-datacloud-act` / `sf-pi` `/sf-data360`
+7. **Scopes the funding programs** — before writing any code, queries the org for active `FundingOpportunity` records, presents them to you, and asks which programs the agent should cover and what the eligibility criteria are for each (org type, geography, revenue caps, years in operation, etc.). Nothing gets built until this is confirmed — eligibility Flows, BRE rule sets, and agent instructions are all program-specific and cannot be generated correctly from assumptions.
+8. **Builds the agent** — NGA Agent Script (via `developing-agentforce` skill) or legacy Agent Builder guidance with step-by-step instructions
+9. **Wires in Data 360** — D360 for Public Sector semantic model mapping, Identity Resolution, Calculated Insights, delegating to `sf-datacloud-act` / `sf-pi` `/sf-data360`
 
 ---
 

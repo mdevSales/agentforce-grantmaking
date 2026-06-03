@@ -255,10 +255,44 @@ Fill in:
 
 ---
 
+### Phase 3.5 — Program & Eligibility Scoping (REQUIRED before build — no exceptions)
+
+**Before writing a single line of agent code or Flow, confirm which programs the agent covers and what the eligibility rules are for each.**
+
+Do NOT assume, infer from description text, or use whatever happens to be in the org. Ask explicitly.
+
+**Step 1 — Query the org for active FundingOpportunity records:**
+```bash
+sf data query --json -q "SELECT Id, Name, Status, MinimumFundingAmount, MaximumFundingAmount, gps_Funding_Eligibility__c, IDOGrant_Type__c FROM FundingOpportunity WHERE Status = 'Active' ORDER BY Name" --target-org YOUR_ORG_ALIAS
+```
+
+**Step 2 — Present the results to the partner** with Id, Name, min/max amounts, and any eligibility text already on the record.
+
+**Step 3 — Ask the partner ALL of the following before proceeding:**
+
+1. **Which programs should the agent cover?** (Select from the list — may be one, several, or all)
+2. **For each selected program — what are the eligibility criteria?**
+   - Eligible organization types (nonprofit, small business, government entity, individual, etc.)
+   - Geographic restrictions (state, county, metro area)
+   - Revenue or size caps
+   - Minimum years in operation
+   - Any program-specific criteria not captured in the record
+3. **Are the eligibility criteria already in the `gps_Funding_Eligibility__c` field, or do they need to be written fresh?**
+4. **If BRE is in scope — one rule set per program, or a shared rule set?**
+5. **Should the agent surface program descriptions to grant seekers, or just eligibility outcomes?**
+
+**Step 4 — Document the answers in the Agent Spec** under a new "Program Scope & Eligibility Rules" section before proceeding to build.
+
+**Why this step exists:** Eligibility Flows, BRE rule sets, the recommend_programs action, and the agent's instructions are all program-specific. Building without this confirmation produces generic code that may not match any real program's rules — as happened when these questions were skipped and the agent was built against programs chosen without partner input.
+
+**STOP. Do not proceed to Phase 4 until the partner has confirmed program scope and eligibility criteria.**
+
+---
+
 ### Phase 4 — Build
 
 **NGA Path** — delegate to `developing-agentforce` with full context:
-- Include approved Agent Spec
+- Include approved Agent Spec (with Program Scope & Eligibility Rules section filled in)
 - Start ADL indexing early (it takes minutes) — kick off before writing `.agent` code
 - Use Flow stubs from [references/flow-backing-logic-guide.md](references/flow-backing-logic-guide.md) not Apex stubs
 - Prompt Template actions → delegate to `salesforce-prompt-templates` skill
